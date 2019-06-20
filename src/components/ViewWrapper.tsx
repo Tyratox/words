@@ -3,11 +3,15 @@ import styled from "styled-components";
 import { SafeAreaView } from "react-native";
 
 const Wrapper = styled(SafeAreaView)`
-  padding: 10;
+  margin: 30px 0;
 `;
 
-const ViewWrapper = React.memo(({ children }) => {
-  return <Wrapper>{children}</Wrapper>;
-});
+interface Props {}
+
+class ViewWrapper extends React.PureComponent<Props> {
+  render() {
+    return <Wrapper>{this.props.children}</Wrapper>;
+  }
+}
 
 export default ViewWrapper;

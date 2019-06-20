@@ -10,10 +10,17 @@ class Find extends React.Component {
 
   render() {
     return (
-      <ViewWrapper
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      >
-        <Text>Find</Text>
+      <ViewWrapper>
+        <View
+          style={{
+            height: "100%",
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Text>Find</Text>
+        </View>
       </ViewWrapper>
     );
   }
