@@ -1,6 +1,16 @@
 import React from "react";
 import { NavigationScreenProp, ScrollView } from "react-navigation";
-import TagInput from "react-native-tag-input";
+import { createStackNavigator } from "react-navigation";
+import {
+  Text,
+  View,
+  KeyboardAvoidingView,
+  Button,
+  ActivityIndicator,
+  AsyncStorage,
+  Alert
+} from "react-native";
+import generateUuid from "uuid/v1";
 
 import ViewWrapper from "../components/ViewWrapper";
 import Heading from "../components/Heading";
@@ -8,15 +18,17 @@ import Border from "../components/Border";
 import Wrapper from "../components/Wrapper";
 import Textarea from "../components/Textarea";
 import HiddenInput from "../components/compose/HiddenInput";
-import { Text, View, KeyboardAvoidingView, Button } from "react-native";
 import Sources, { Source } from "../components/compose/Sources";
 import WYSIWYGInput from "../components/WYSIWYGInput";
+import WYSIWYGEditor from "./compose/WYSIWYGEditor";
+import { COLOR_PRIMARY } from "../styles";
+import Drafts from "./compose/Drafts";
 
 interface Props {
   navigation: NavigationScreenProp<{}>;
 }
 
-interface State {
+export interface ComposeData {
   headline: string;
   lead: string;
   showLead: boolean;
@@ -24,31 +36,90 @@ interface State {
   sources: Array<Source>;
 }
 
-class Compose extends React.Component<Props, State> {
+interface State extends ComposeData {
+  fullscreen: boolean;
+  cacheLoaded: boolean;
+}
+
+const DEFAULT_STATE: State = {
+  headline: "",
+  lead: "",
+  showLead: false,
+  content: "",
+  fullscreen: false,
+  cacheLoaded: false,
+  sources: [
+    {
+      type: "website",
+      title: "Wikipedia",
+      url: "https://wikipedia.org/meta/about/wikipedia"
+    },
+    { type: "book", title: "1984", author: "George Orwell" }
+  ]
+};
+
+class ComposeComponent extends React.Component<Props, State> {
   static navigationOptions = {
     title: "Schreiben"
   };
 
+  storeInterval = null;
+
   constructor(props) {
     super(props);
 
-    this.state = {
-      headline: "",
-      lead: "",
-      showLead: false,
-      content: "",
-      sources: [
-        {
-          type: "website",
-          title: "Wikipedia",
-          url: "https://wikipedia.org/meta/about/wikipedia"
-        },
-        { type: "book", title: "1984", author: "George Orwell" }
-      ]
-    };
+    this.state = DEFAULT_STATE;
+
+    this.loadData();
+    this.storeInterval = setInterval(this.storeData, 5000);
   }
+
+  componentWillUnmount = () => {
+    clearInterval(this.storeInterval);
+  };
+
+  getComposeData = () => ({
+    headline: this.state.headline,
+    lead: this.state.lead,
+    content: this.state.content,
+    sources: this.state.sources
+  });
+
+  loadData = () => {
+    return AsyncStorage.getItem("compose.cache").then(value => {
+      if (value !== null) {
+        const data: ComposeData = JSON.parse(value);
+        this.setState({ ...this.state, ...data, cacheLoaded: true });
+      } else {
+        this.setState({ cacheLoaded: true });
+      }
+    });
+  };
+
+  storeData = () => {
+    return AsyncStorage.setItem(
+      "compose.cache",
+      JSON.stringify(this.getComposeData())
+    );
+  };
+
   //keyboardDismissMode={"on-drag"}
   render() {
+    if (!this.state.cacheLoaded) {
+      return (
+        <View
+          style={{
+            height: "100%",
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <ActivityIndicator size="large" color={COLOR_PRIMARY} />
+        </View>
+      );
+    }
+
     return (
       <ViewWrapper>
         <ScrollView style={{ height: "100%" }}>
@@ -59,7 +130,7 @@ class Compose extends React.Component<Props, State> {
             <Border />
             <Wrapper>
               <Textarea
-                placeholder={"Headline"}
+                placeholder="Headline: Revolutionäre Blogging-App"
                 autoFocus
                 onChange={text => {
                   this.setState({ headline: text });
@@ -85,11 +156,13 @@ class Compose extends React.Component<Props, State> {
             <Border />
             <Wrapper>
               <WYSIWYGInput
-                placeholder={"Text"}
+                placeholder={"Text: Man glaubt es kaum: ..."}
                 onChange={text => {
                   this.setState({ content: text });
                 }}
                 value={this.state.content}
+                navigation={this.props.navigation}
+                isFullscreen={false}
               />
             </Wrapper>
             <Border />
@@ -110,12 +183,61 @@ class Compose extends React.Component<Props, State> {
               </HiddenInput>
             </Wrapper>
             <Border />
-            <Button title="Veröffentlichen" onPress={() => {}} />
+            <Button
+              title="Entwurf laden"
+              onPress={() => {
+                this.props.navigation.navigate("Drafts", {
+                  onLoad: (draft: ComposeData) => {
+                    this.setState({ ...this.state, ...draft });
+                  }
+                });
+              }}
+            />
+            <Button
+              title="Entwurf speichern"
+              onPress={() => {
+                const data = JSON.stringify(this.getComposeData());
+                const id = generateUuid();
+                AsyncStorage.getItem("draftIds")
+                  .then(draftIds => {
+                    if (!draftIds) {
+                      draftIds = id;
+                    } else {
+                      draftIds += ";" + id;
+                    }
+
+                    return AsyncStorage.setItem("draftIds", draftIds);
+                  })
+                  .then(() => AsyncStorage.setItem(`draft:${id}`, data))
+                  .then(() =>
+                    this.setState({ ...DEFAULT_STATE, cacheLoaded: true })
+                  )
+                  .catch(e => Alert.alert("Es ist ein Fehler aufgetreten", e));
+              }}
+            />
+            <Button title="Vorschau und veröffentlichen" onPress={() => {}} />
           </KeyboardAvoidingView>
         </ScrollView>
       </ViewWrapper>
     );
   }
 }
+
+const Compose = createStackNavigator(
+  {
+    Compose: {
+      screen: ComposeComponent
+    },
+    WYSIWYGEditor: {
+      screen: WYSIWYGEditor
+    },
+    Drafts: {
+      screen: Drafts
+    }
+  },
+  {
+    initialRouteName: "Compose"
+  }
+);
 
 export default Compose;

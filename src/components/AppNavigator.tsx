@@ -14,7 +14,10 @@ const TabNavigator = createBottomTabNavigator(
       screen: Find
     },
     Compose: {
-      screen: Compose
+      screen: Compose,
+      navigationOptions: ({ navigation }) => ({
+        title: `Schreiben`
+      })
     },
     Newspaper: {
       screen: Newspaper

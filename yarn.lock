@@ -5269,6 +5269,11 @@ react-native-svg@8.0.10:
     lodash "^4.16.6"
     pegjs "^0.10.0"
 
+react-native-swipe-list-view@^1.5.6:
+  version "1.5.6"
+  resolved "https://registry.yarnpkg.com/react-native-swipe-list-view/-/react-native-swipe-list-view-1.5.6.tgz#152f083ef62ffbac2f71a17f7e5c522c9dc37ec3"
+  integrity sha512-IhVqHEwfGmYj/ZiETPPRRcr8hScNTPkkXH6QWMYrrWiSyMO30VwiE9UP9Hzt6PqNuh0qQqp7MPh6kvUEt2aPJA==
+
 react-native-tab-view@^1.2.0:
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-1.3.4.tgz#63fc3eb09652651d0ea0e016cff0f3a5e535f4de"

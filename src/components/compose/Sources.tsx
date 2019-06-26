@@ -2,9 +2,6 @@ import React from "react";
 import { FlatList, View, Text, Linking, TouchableOpacity } from "react-native";
 import styled from "styled-components";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Textarea from "../Textarea";
-import ModalDropdown from "react-native-modal-dropdown";
-import Dropdown from "../Dropdown";
 import NewSource from "../NewSource";
 
 const ListEntry = styled(View)`

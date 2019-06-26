@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/Cellar/node/12.4.0/bin/node /usr/local/Cellar/yarn/1.17.0/libexec/bin/yarn.js add react-native-parsed-text @types/react-native-parsed-text
+  /usr/local/Cellar/node/12.4.0/bin/node /usr/local/Cellar/yarn/1.17.0/libexec/bin/yarn.js add @types/react-native-swipe-list-view
 
 PATH: 
   /usr/local/bin:/usr/local/sbin:/Users/mac/bin:/Users/mac/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/opt/X11/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Wireshark.app/Contents/MacOS:/usr/local/sbin:/Users/mac/bin:/Users/mac/.cargo/bin:/Users/mac/.composer/vendor/bin:/usr/local/opt/go/libexec/bin:/Users/mac/Library/Python/3.7/bin:/Users/mac/.composer/vendor/bin:/usr/local/opt/go/libexec/bin:/Users/mac/Library/Python/3.7/bin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2freact-native-parsed-text: Not found
+  Error: https://registry.yarnpkg.com/@types%2freact-native-swipe-list-view: Not found
       at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.17.0/libexec/lib/cli.js:66823:18)
       at Request.self.callback (/usr/local/Cellar/yarn/1.17.0/libexec/lib/cli.js:140439:22)
       at Request.emit (events.js:200:13)
@@ -44,8 +44,11 @@ npm manifest:
       "react": "16.5.0",
       "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
       "react-native-modal-dropdown": "^0.6.2",
+      "react-native-parsed-text": "^0.0.21",
+      "react-native-swipe-list-view": "^1.5.6",
       "react-navigation": "^3.11.0",
-      "styled-components": "^4.2.0"
+      "styled-components": "^4.2.0",
+      "uuid": "^3.3.2"
     },
     "devDependencies": {
       "babel-preset-expo": "^5.1.1"
@@ -5288,6 +5291,13 @@ Lockfile:
     dependencies:
       prop-types "^15.6.0"
   
+  react-native-parsed-text@^0.0.21:
+    version "0.0.21"
+    resolved "https://registry.yarnpkg.com/react-native-parsed-text/-/react-native-parsed-text-0.0.21.tgz#86cf233aedc7a848b801b674c81d6b5ee37162df"
+    integrity sha512-0oqnn7/2TxkQW+6z7MN8SrPdEldDlDYScCK4QfHRsCmzllZFeBfdGNdYaIkSX35JWN++SSq7VBfHR74pUDmb2A==
+    dependencies:
+      prop-types "^15.5.10"
+  
   react-native-reanimated@1.0.0-alpha.11:
     version "1.0.0-alpha.11"
     resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-1.0.0-alpha.11.tgz#b78c839bae878d149561b56a3c750414957ea86d"
@@ -5320,6 +5330,11 @@ Lockfile:
       color "^2.0.1"
       lodash "^4.16.6"
       pegjs "^0.10.0"
+  
+  react-native-swipe-list-view@^1.5.6:
+    version "1.5.6"
+    resolved "https://registry.yarnpkg.com/react-native-swipe-list-view/-/react-native-swipe-list-view-1.5.6.tgz#152f083ef62ffbac2f71a17f7e5c522c9dc37ec3"
+    integrity sha512-IhVqHEwfGmYj/ZiETPPRRcr8hScNTPkkXH6QWMYrrWiSyMO30VwiE9UP9Hzt6PqNuh0qQqp7MPh6kvUEt2aPJA==
   
   react-native-tab-view@^1.2.0:
     version "1.3.4"

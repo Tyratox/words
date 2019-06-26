@@ -42,6 +42,17 @@ const createEmptySource = (type: string): Source => {
   }
 };
 
+const isEmptySource = (value: Source) => {
+  switch (value.type) {
+    case "book":
+      return value.title.length == 0 || value.author.length == 0;
+    case "website":
+      return value.title.length == 0 || value.url.length == 0;
+    default:
+      return true;
+  }
+};
+
 interface Props {
   onNewSource: (source: Source) => any;
   getUpdateFunction: (callback: (source: Source) => void) => void;
@@ -177,7 +188,7 @@ class NewSource extends React.PureComponent<Props, State> {
         <Button
           title="Hinzufügen"
           onPress={() => {
-            if (this.state.value.type !== "empty") {
+            if (!isEmptySource(this.state.value)) {
               this.props.onNewSource(this.state.value);
               this.setState({
                 type: OPTIONS[0],

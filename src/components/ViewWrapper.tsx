@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { SafeAreaView } from "react-native";
 
 const Wrapper = styled(SafeAreaView)`
-  margin: 30px 0;
+  margin: 16px 0;
 `;
 
 interface Props {}
