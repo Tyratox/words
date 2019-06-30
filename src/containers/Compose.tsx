@@ -29,7 +29,7 @@ interface Props {
 }
 
 export interface ComposeData {
-  headline: string;
+  title: string;
   lead: string;
   showLead: boolean;
   content: string;
@@ -42,7 +42,7 @@ interface State extends ComposeData {
 }
 
 const DEFAULT_STATE: State = {
-  headline: "",
+  title: "",
   lead: "",
   showLead: false,
   content: "",
@@ -79,7 +79,7 @@ class ComposeComponent extends React.Component<Props, State> {
   };
 
   getComposeData = () => ({
-    headline: this.state.headline,
+    title: this.state.title,
     lead: this.state.lead,
     content: this.state.content,
     sources: this.state.sources
@@ -133,9 +133,9 @@ class ComposeComponent extends React.Component<Props, State> {
                 placeholder="Headline: Revolutionäre Blogging-App"
                 autoFocus
                 onChange={text => {
-                  this.setState({ headline: text });
+                  this.setState({ title: text });
                 }}
-                value={this.state.headline}
+                value={this.state.title}
                 multiline={false}
               />
             </Wrapper>

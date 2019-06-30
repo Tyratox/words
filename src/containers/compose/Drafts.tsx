@@ -136,7 +136,7 @@ class Drafts extends React.Component<Props, State> {
                     this.props.navigation.goBack();
                   }}
                 >
-                  <ItemText>{draft.headline}</ItemText>
+                  <ItemText>{draft.title}</ItemText>
                 </RowFront>
               )}
               renderHiddenItem={({ item: draft }, rowMap) => (
@@ -146,7 +146,7 @@ class Drafts extends React.Component<Props, State> {
                       Alert.alert(
                         "Löschen?",
                         `Soll der Entwurf '${
-                          draft.headline
+                          draft.title
                         }' tatsächlich gelöscht werden?`,
                         [
                           { text: "Abbrechen", onPress: () => {} },
