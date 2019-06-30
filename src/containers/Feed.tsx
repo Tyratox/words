@@ -9,7 +9,7 @@ interface Props {
   navigation: NavigationScreenProp<{}>;
 }
 
-class Newspaper extends React.Component<Props> {
+class Feed extends React.Component<Props> {
   static navigationOptions = {
     title: "Words"
   };
@@ -38,4 +38,4 @@ class Newspaper extends React.Component<Props> {
   }
 }
 
-export default Newspaper;
+export default Feed;

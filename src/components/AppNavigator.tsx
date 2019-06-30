@@ -3,15 +3,15 @@ import { createBottomTabNavigator, createAppContainer } from "react-navigation";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-import Newspaper from "../containers/Newspaper";
+import Feed from "../containers/Feed";
 import Compose from "../containers/Compose";
 import Find from "../containers/Find";
 import { COLOR_PRIMARY, COLOR_DISABLED } from "../styles";
 
 const TabNavigator = createBottomTabNavigator(
   {
-    Find: {
-      screen: Find
+    Feed: {
+      screen: Feed
     },
     Compose: {
       screen: Compose,
@@ -19,12 +19,12 @@ const TabNavigator = createBottomTabNavigator(
         title: `Schreiben`
       })
     },
-    Newspaper: {
-      screen: Newspaper
+    Find: {
+      screen: Find
     }
   },
   {
-    initialRouteName: "Newspaper",
+    initialRouteName: "Feed",
     defaultNavigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused, horizontal, tintColor }) => {
         const { routeName } = navigation.state;
@@ -37,9 +37,9 @@ const TabNavigator = createBottomTabNavigator(
           // Sometimes we want to add badges to some icons.
           // You can check the implementation below.
           //IconComponent = HomeIconWithBadge;
-        } else if (routeName === "Newspaper") {
+        } else if (routeName === "Feed") {
           IconComponent = FontAwesome;
-          iconName = `newspaper-o`;
+          iconName = `home`;
         } else if (routeName === "Find") {
           IconComponent = Feather;
           iconName = `search`;
@@ -50,10 +50,11 @@ const TabNavigator = createBottomTabNavigator(
       }
     }),
     tabBarOptions: {
+      showLabel: false,
       activeTintColor: COLOR_PRIMARY,
       inactiveTintColor: COLOR_DISABLED
     }
   }
 );
 
-export default createAppContainer(TabNavigator);
+export default TabNavigator;
