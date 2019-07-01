@@ -2,11 +2,12 @@ import React from "react";
 import { Text, View, Button, Alert } from "react-native";
 import { NavigationScreenProp, FlatList } from "react-navigation";
 import gql from "graphql-tag";
+import styled from "styled-components";
 
 import Wrapper from "../components/Wrapper";
 import ViewWrapper from "../components/ViewWrapper";
-import { GraphQLRequest } from "apollo-link";
-import { GraphqlQueryControls, graphql, Query } from "react-apollo";
+import { Query } from "react-apollo";
+import Post from "../components/Post";
 
 interface Props {
   navigation: NavigationScreenProp<{}>;
@@ -28,24 +29,31 @@ class Feed extends React.Component<Props> {
     return (
       <ViewWrapper>
         <Query query={query} variables={{ count: 10 }}>
-          {({ loading, error, data }) => {
-            if (loading || error) {
-              return <View />;
+          {({ loading, error, data, refetch }) => {
+            if (error) {
+              return <View>{JSON.stringify(error)}</View>;
             }
-            return (
-              <FlatList
-                data={data.latestPosts}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={data => {
-                  const item: any = data.item;
 
-                  return (
-                    <View>
-                      <Text>{item.title}</Text>
-                    </View>
-                  );
-                }}
-              />
+            return (
+              <Wrapper>
+                <FlatList
+                  data={data.latestPosts}
+                  keyExtractor={(item, index) => index.toString()}
+                  refreshing={loading}
+                  onRefresh={refetch}
+                  renderItem={data => {
+                    const item: any = data.item;
+
+                    return (
+                      <Post
+                        title={item.title}
+                        lead={item.lead}
+                        content={item.content}
+                      />
+                    );
+                  }}
+                />
+              </Wrapper>
             );
           }}
         </Query>

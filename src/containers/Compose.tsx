@@ -3,10 +3,8 @@ import { NavigationScreenProp, ScrollView } from "react-navigation";
 import { createStackNavigator } from "react-navigation";
 import {
   Text,
-  View,
   KeyboardAvoidingView,
   Button,
-  ActivityIndicator,
   AsyncStorage,
   Alert
 } from "react-native";
@@ -23,6 +21,10 @@ import WYSIWYGInput from "../components/WYSIWYGInput";
 import WYSIWYGEditor from "./compose/WYSIWYGEditor";
 import { COLOR_PRIMARY } from "../styles";
 import Drafts from "./compose/Drafts";
+import LoadingView from "../components/LoadingView";
+import gql from "graphql-tag";
+import { Mutation } from "react-apollo";
+import PostPreviewModal from "../components/modals/PostPreviewModal";
 
 interface Props {
   navigation: NavigationScreenProp<{}>;
@@ -39,15 +41,18 @@ export interface ComposeData {
 interface State extends ComposeData {
   fullscreen: boolean;
   cacheLoaded: boolean;
+  showPreview: boolean;
 }
 
 const DEFAULT_STATE: State = {
+  fullscreen: false,
+  cacheLoaded: false,
+  showPreview: false,
+
   title: "",
   lead: "",
   showLead: false,
   content: "",
-  fullscreen: false,
-  cacheLoaded: false,
   sources: [
     {
       type: "website",
@@ -103,21 +108,12 @@ class ComposeComponent extends React.Component<Props, State> {
     );
   };
 
+  resetState = () => this.setState({ ...DEFAULT_STATE, cacheLoaded: true });
+
   //keyboardDismissMode={"on-drag"}
   render() {
     if (!this.state.cacheLoaded) {
-      return (
-        <View
-          style={{
-            height: "100%",
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <ActivityIndicator size="large" color={COLOR_PRIMARY} />
-        </View>
-      );
+      return <LoadingView />;
     }
 
     return (
@@ -209,13 +205,22 @@ class ComposeComponent extends React.Component<Props, State> {
                     return AsyncStorage.setItem("draftIds", draftIds);
                   })
                   .then(() => AsyncStorage.setItem(`draft:${id}`, data))
-                  .then(() =>
-                    this.setState({ ...DEFAULT_STATE, cacheLoaded: true })
-                  )
+                  .then(() => this.resetState())
                   .catch(e => Alert.alert("Es ist ein Fehler aufgetreten", e));
               }}
             />
-            <Button title="Vorschau und veröffentlichen" onPress={() => {}} />
+            <Button
+              title="Vorschau und veröffentlichen"
+              onPress={() => this.setState({ showPreview: true })}
+            />
+            <PostPreviewModal
+              visible={this.state.showPreview}
+              title={this.state.title}
+              lead={this.state.lead}
+              content={this.state.content}
+              onCreate={this.resetState}
+              close={() => this.setState({ showPreview: false })}
+            />
           </KeyboardAvoidingView>
         </ScrollView>
       </ViewWrapper>

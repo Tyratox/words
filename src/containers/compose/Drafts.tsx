@@ -2,12 +2,9 @@ import React from "react";
 import {
   AsyncStorage,
   View,
-  ActivityIndicator,
   Text,
   Alert,
-  Platform,
   TouchableHighlight,
-  StyleSheet,
   TouchableOpacity
 } from "react-native";
 import styled from "styled-components";
@@ -21,6 +18,7 @@ import {
 import Wrapper from "../../components/Wrapper";
 import { ComposeData } from "../Compose";
 import { COLOR_PRIMARY } from "../../styles";
+import LoadingView from "../../components/LoadingView";
 
 const ItemText = styled(Text)`
   font-size: 24px;
@@ -108,18 +106,7 @@ class Drafts extends React.Component<Props, State> {
 
   render() {
     if (!this.state.draftsLoaded) {
-      return (
-        <View
-          style={{
-            height: "100%",
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <ActivityIndicator size="large" color={COLOR_PRIMARY} />
-        </View>
-      );
+      return <LoadingView />;
     }
 
     return (

@@ -16,6 +16,7 @@ import AppNavigator from "./src/components/AppNavigator";
 import { COLOR_PRIMARY } from "./src/styles";
 import Welcome from "./src/containers/Welcome";
 import { API_URL } from "./src/utilities/api";
+import LoadingView from "./src/components/LoadingView";
 
 const AppContainer = createAppContainer(AppNavigator);
 const WelcomeContainer = createAppContainer(Welcome);
@@ -70,18 +71,7 @@ class App extends React.PureComponent {
 
   render() {
     if (!this.state.stateLoaded) {
-      return (
-        <View
-          style={{
-            height: "100%",
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <ActivityIndicator size="large" color={COLOR_PRIMARY} />
-        </View>
-      );
+      return <LoadingView />;
     }
 
     if (!this.props.isAuthenticated) {

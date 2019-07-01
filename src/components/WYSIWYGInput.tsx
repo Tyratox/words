@@ -1,13 +1,12 @@
 import React from "react";
 import styled from "styled-components";
-import ParsedText from "react-native-parsed-text";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-import { COLOR_PRIMARY } from "../styles";
 import Textarea from "./Textarea";
 import Border from "./Border";
 import { NavigationScreenProp, NavigationParams } from "react-navigation";
+import PostContent from "./PostContent";
 
 const StyledView = styled(View)`
   display: flex;
@@ -21,26 +20,6 @@ const EditView = styled(View)`
   margin-bottom: ${({ isFullscreen }) => (isFullscreen ? "0" : "30")}px;
   min-height: ${({ isFullscreen }) => (isFullscreen ? "64" : "0")}px;
 `;
-
-const styles = StyleSheet.create({
-  url: {
-    textDecorationLine: "underline"
-  },
-
-  text: {
-    fontSize: 14
-  },
-
-  username: {
-    color: "#000",
-    fontWeight: "bold"
-  },
-
-  hashTag: {
-    fontStyle: "italic",
-    color: COLOR_PRIMARY
-  }
-});
 
 const FullsceenButton = styled(TouchableOpacity)`
   position: absolute;
@@ -84,20 +63,7 @@ class WYSIWYGInput extends React.PureComponent<Props, State> {
         </EditView>
         <Border />
         <Text>Vorschau:</Text>
-        <ParsedText
-          style={styles.text}
-          parse={[
-            { type: "url", style: styles.url },
-            {
-              pattern: /@[A-z0-9]+/i,
-              style: styles.username
-            },
-            { pattern: /#(\w+)/, style: styles.hashTag }
-          ]}
-          childrenProps={{ allowFontScaling: false }}
-        >
-          {this.props.value}
-        </ParsedText>
+        <PostContent>{this.props.value}</PostContent>
       </StyledView>
     );
   }
