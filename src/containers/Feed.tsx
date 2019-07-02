@@ -1,6 +1,17 @@
 import React from "react";
-import { Text, View, Button, Alert } from "react-native";
-import { NavigationScreenProp, FlatList } from "react-navigation";
+import {
+  Text,
+  View,
+  Button,
+  Alert,
+  TouchableOpacity,
+  FlatList
+} from "react-native";
+import {
+  NavigationScreenProp,
+  NavigationParams,
+  createStackNavigator
+} from "react-navigation";
 import gql from "graphql-tag";
 import styled from "styled-components";
 
@@ -8,9 +19,10 @@ import Wrapper from "../components/Wrapper";
 import ViewWrapper from "../components/ViewWrapper";
 import { Query } from "react-apollo";
 import Post from "../components/Post";
+import PostDetail from "./PostDetail";
 
 interface Props {
-  navigation: NavigationScreenProp<{}>;
+  navigation: NavigationScreenProp<{}, NavigationParams>;
 }
 
 const query = gql`
@@ -20,18 +32,31 @@ const query = gql`
       title
       lead
       content
+      createdAt
+
+      user {
+        name
+      }
     }
   }
 `;
 
-class Feed extends React.Component<Props> {
+class FeedComponent extends React.Component<Props> {
+  static navigationOptions = {
+    title: "Feed"
+  };
+
   render() {
     return (
-      <ViewWrapper>
+      <View>
         <Query query={query} variables={{ count: 10 }}>
           {({ loading, error, data, refetch }) => {
             if (error) {
-              return <View>{JSON.stringify(error)}</View>;
+              return (
+                <View>
+                  <Text>{JSON.stringify(error)}</Text>
+                </View>
+              );
             }
 
             return (
@@ -45,11 +70,20 @@ class Feed extends React.Component<Props> {
                     const item: any = data.item;
 
                     return (
-                      <Post
-                        title={item.title}
-                        lead={item.lead}
-                        content={item.content}
-                      />
+                      <TouchableOpacity
+                        onPress={() => {
+                          this.props.navigation.navigate("PostDetail", item);
+                        }}
+                      >
+                        <Post
+                          title={item.title}
+                          author={item.user.name}
+                          createdAt={item.createdAt}
+                          lead={item.lead}
+                          fullLead={false}
+                          content={false}
+                        />
+                      </TouchableOpacity>
                     );
                   }}
                 />
@@ -57,9 +91,23 @@ class Feed extends React.Component<Props> {
             );
           }}
         </Query>
-      </ViewWrapper>
+      </View>
     );
   }
 }
+
+const Feed = createStackNavigator(
+  {
+    Feed: {
+      screen: FeedComponent
+    },
+    PostDetail: {
+      screen: PostDetail
+    }
+  },
+  {
+    initialRouteName: "Feed"
+  }
+);
 
 export default Feed;

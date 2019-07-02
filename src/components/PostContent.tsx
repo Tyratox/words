@@ -16,7 +16,8 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 14
+    fontSize: 16
+    /*textAlign: "justify"*/
   },
 
   username: {

@@ -9,7 +9,9 @@ import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
 import { setContext } from "apollo-link-context";
 import { InMemoryCache } from "apollo-cache-inmemory";
-import { AsyncStorage, View, ActivityIndicator, Alert } from "react-native";
+import { AsyncStorage } from "react-native";
+import moment from "moment";
+import "moment/locale/de";
 
 import reducers from "./src/reducers";
 import AppNavigator from "./src/components/AppNavigator";
@@ -17,6 +19,8 @@ import { COLOR_PRIMARY } from "./src/styles";
 import Welcome from "./src/containers/Welcome";
 import { API_URL } from "./src/utilities/api";
 import LoadingView from "./src/components/LoadingView";
+
+moment.locale("de");
 
 const AppContainer = createAppContainer(AppNavigator);
 const WelcomeContainer = createAppContainer(Welcome);

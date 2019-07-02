@@ -176,7 +176,9 @@ class Drafts extends React.Component<Props, State> {
               rightOpenValue={-90}
             />
           ) : (
-            <Text>Es wurden bisher keine Entwürfe gespeichert.</Text>
+            <Text style={{ marginTop: 16 }}>
+              Es wurden bisher keine Entwürfe gespeichert.
+            </Text>
           )}
         </Wrapper>
       </View>
