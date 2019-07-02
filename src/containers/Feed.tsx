@@ -25,9 +25,9 @@ interface Props {
   navigation: NavigationScreenProp<{}, NavigationParams>;
 }
 
-const query = gql`
-  query latestPosts($count: Int!) {
-    latestPosts(count: $count) {
+const FETCH_LATEST_POSTS = gql`
+  query latestPosts($count: Int!, $after: Int) {
+    latestPosts(count: $count, after: $after) {
       id
       title
       lead
@@ -49,8 +49,12 @@ class FeedComponent extends React.Component<Props> {
   render() {
     return (
       <View>
-        <Query query={query} variables={{ count: 10 }}>
-          {({ loading, error, data, refetch }) => {
+        <Query
+          query={FETCH_LATEST_POSTS}
+          variables={{ count: 10 }}
+          notifyOnNetworkStatusChange
+        >
+          {({ loading, error, data, refetch, fetchMore }) => {
             if (error) {
               return (
                 <View>
@@ -66,6 +70,27 @@ class FeedComponent extends React.Component<Props> {
                   keyExtractor={(item, index) => index.toString()}
                   refreshing={loading}
                   onRefresh={refetch}
+                  onEndReachedThreshold={0.4}
+                  onEndReached={() =>
+                    fetchMore({
+                      variables: {
+                        count: 10,
+                        after: parseInt(
+                          data.latestPosts[data.latestPosts.length - 1].id
+                        )
+                      },
+                      updateQuery: (prev, { fetchMoreResult }) => {
+                        if (!fetchMoreResult) return prev;
+                        return {
+                          ...prev,
+                          latestPosts: [
+                            ...prev.latestPosts,
+                            ...fetchMoreResult.latestPosts
+                          ]
+                        };
+                      }
+                    })
+                  }
                   renderItem={data => {
                     const item: any = data.item;
 
