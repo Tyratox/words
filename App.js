@@ -6,10 +6,12 @@ import { createAppContainer } from "react-navigation";
 import throttle from "lodash/throttle";
 import { ApolloClient } from "apollo-client";
 import { ApolloProvider } from "react-apollo";
+import { ApolloLink } from "apollo-link";
 import { HttpLink } from "apollo-link-http";
+import { onError } from "apollo-link-error";
 import { setContext } from "apollo-link-context";
 import { InMemoryCache } from "apollo-cache-inmemory";
-import { AsyncStorage } from "react-native";
+import { AsyncStorage, Alert } from "react-native";
 import moment from "moment";
 import "moment/locale/de";
 
@@ -19,6 +21,7 @@ import { COLOR_PRIMARY } from "./src/styles";
 import Welcome from "./src/containers/Welcome";
 import { API_URL } from "./src/utilities/api";
 import LoadingView from "./src/components/LoadingView";
+import { createLogoutAction } from "./src/actions/authentication";
 
 moment.locale("de");
 
@@ -40,8 +43,27 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    /*graphQLErrors.map(({ message, locations, path }) =>
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    );*/
+  }
+
+  if (networkError) {
+    // console.log(`[Network error]: ${networkError}`);
+    if (networkError.statusCode === 401) {
+      store.dispatch(createLogoutAction());
+    }
+  }
+});
+
+const link = ApolloLink.from([errorLink, authLink, httpLink]);
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: link,
   cache: new InMemoryCache()
 });
 

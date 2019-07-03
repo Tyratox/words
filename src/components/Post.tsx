@@ -4,6 +4,9 @@ import { Text, View } from "react-native";
 import TimeAgo from "react-native-timeago";
 
 import PostContent from "./PostContent";
+import Border from "./Border";
+import Sources from "./Sources";
+import { Source } from "./compose/EditableSources";
 
 const PostHeader = styled(View)`
   margin-top: 16px;
@@ -39,6 +42,8 @@ interface Props {
   fullLead: boolean;
   content: string | boolean;
   createdAt: string;
+  showSources: boolean;
+  sources?: Source[];
 }
 interface State {}
 
@@ -60,6 +65,12 @@ class Post extends React.PureComponent<Props, State> {
         ) : null}
         {typeof this.props.content === "string" ? (
           <PostContent>{this.props.content}</PostContent>
+        ) : null}
+        {this.props.showSources && this.props.sources ? (
+          <View>
+            <Border />
+            <Sources sources={this.props.sources} />
+          </View>
         ) : null}
       </View>
     );

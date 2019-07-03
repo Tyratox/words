@@ -1,6 +1,10 @@
 import React from "react";
-import { NavigationScreenProp, ScrollView } from "react-navigation";
-import { createStackNavigator } from "react-navigation";
+import {
+  NavigationScreenProp,
+  ScrollView,
+  NavigationParams,
+  createStackNavigator
+} from "react-navigation";
 import {
   Text,
   KeyboardAvoidingView,
@@ -16,7 +20,7 @@ import Border from "../components/Border";
 import Wrapper from "../components/Wrapper";
 import Textarea from "../components/Textarea";
 import HiddenInput from "../components/compose/HiddenInput";
-import Sources, { Source } from "../components/compose/Sources";
+import EditableSources, { Source } from "../components/compose/EditableSources";
 import WYSIWYGInput from "../components/WYSIWYGInput";
 import WYSIWYGEditor from "./compose/WYSIWYGEditor";
 import { COLOR_PRIMARY } from "../styles";
@@ -25,15 +29,15 @@ import LoadingView from "../components/LoadingView";
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
 import PostPreviewModal from "../components/modals/PostPreviewModal";
+import { NavigationEvents } from "react-navigation";
 
 interface Props {
-  navigation: NavigationScreenProp<{}>;
+  navigation: NavigationScreenProp<{}, NavigationParams>;
 }
 
 export interface ComposeData {
   title: string;
   lead: string;
-  showLead: boolean;
   content: string;
   sources: Array<Source>;
 }
@@ -42,25 +46,19 @@ interface State extends ComposeData {
   fullscreen: boolean;
   cacheLoaded: boolean;
   showPreview: boolean;
+  updateId: number | null;
 }
 
 const DEFAULT_STATE: State = {
   fullscreen: false,
   cacheLoaded: false,
   showPreview: false,
+  updateId: null,
 
   title: "",
   lead: "",
-  showLead: false,
   content: "",
-  sources: [
-    {
-      type: "website",
-      title: "Wikipedia",
-      url: "https://wikipedia.org/meta/about/wikipedia"
-    },
-    { type: "book", title: "1984", author: "George Orwell" }
-  ]
+  sources: []
 };
 
 class ComposeComponent extends React.Component<Props, State> {
@@ -75,9 +73,54 @@ class ComposeComponent extends React.Component<Props, State> {
 
     this.state = DEFAULT_STATE;
 
-    this.loadData();
-    this.storeInterval = setInterval(this.storeData, 5000);
+    //data was passed to us, use it
+    const parentNavigationState = this.props.navigation.dangerouslyGetParent();
+    if (
+      parentNavigationState &&
+      parentNavigationState.state &&
+      parentNavigationState.state.params &&
+      parentNavigationState.state.params.id
+    ) {
+      this.state = {
+        ...this.state,
+        updateId: parseInt(parentNavigationState.state.params.id),
+        title: parentNavigationState.state.params.title,
+        lead: parentNavigationState.state.params.lead,
+        content: parentNavigationState.state.params.content,
+        sources: parentNavigationState.state.params.sources
+          ? parentNavigationState.state.params.sources
+          : [],
+        cacheLoaded: true
+      };
+    } else {
+      this.loadData();
+      this.storeInterval = setInterval(this.storeData, 5000);
+    }
   }
+
+  onFocus = () => {
+    const parentNavigationState = this.props.navigation.dangerouslyGetParent();
+    if (
+      parentNavigationState &&
+      parentNavigationState.state &&
+      parentNavigationState.state.params &&
+      parentNavigationState.state.params.id &&
+      parentNavigationState.state.params.id !== this.state.updateId
+    ) {
+      this.setState({
+        ...this.state,
+        updateId: parseInt(parentNavigationState.state.params.id),
+        title: parentNavigationState.state.params.title,
+        lead: parentNavigationState.state.params.lead,
+        content: parentNavigationState.state.params.content,
+        sources: parentNavigationState.state.params.sources
+          ? parentNavigationState.state.params.sources
+          : [],
+        cacheLoaded: true
+      });
+      parentNavigationState.setParams(undefined);
+    }
+  };
 
   componentWillUnmount = () => {
     clearInterval(this.storeInterval);
@@ -118,6 +161,7 @@ class ComposeComponent extends React.Component<Props, State> {
 
     return (
       <ViewWrapper>
+        <NavigationEvents onDidFocus={this.onFocus} />
         <ScrollView style={{ height: "100%" }}>
           <KeyboardAvoidingView behavior="padding" enabled>
             <Wrapper>
@@ -127,7 +171,6 @@ class ComposeComponent extends React.Component<Props, State> {
             <Wrapper>
               <Textarea
                 placeholder="Headline: Revolutionäre Blogging-App"
-                autoFocus
                 onChange={text => {
                   this.setState({ title: text });
                 }}
@@ -165,7 +208,7 @@ class ComposeComponent extends React.Component<Props, State> {
             <Wrapper>
               <HiddenInput placeholder="Quellen">
                 <Text>Quellen</Text>
-                <Sources
+                <EditableSources
                   sources={this.state.sources}
                   onNewSource={source =>
                     this.setState({ sources: [...this.state.sources, source] })
@@ -179,46 +222,80 @@ class ComposeComponent extends React.Component<Props, State> {
               </HiddenInput>
             </Wrapper>
             <Border />
-            <Button
-              title="Entwurf laden"
-              onPress={() => {
-                this.props.navigation.navigate("Drafts", {
-                  onLoad: (draft: ComposeData) => {
-                    this.setState({ ...this.state, ...draft });
-                  }
-                });
-              }}
-            />
-            <Button
-              title="Entwurf speichern"
-              onPress={() => {
-                const data = JSON.stringify(this.getComposeData());
-                const id = generateUuid();
-                AsyncStorage.getItem("draftIds")
-                  .then(draftIds => {
-                    if (!draftIds) {
-                      draftIds = id;
-                    } else {
-                      draftIds += ";" + id;
+            {!this.state.updateId ? (
+              <React.Fragment>
+                <Button
+                  title="Entwurf laden"
+                  onPress={() => {
+                    this.props.navigation.navigate("Drafts", {
+                      onLoad: (draft: ComposeData) => {
+                        this.setState({
+                          ...DEFAULT_STATE,
+                          ...draft,
+                          cacheLoaded: true
+                        });
+                      }
+                    });
+                  }}
+                />
+                <Button
+                  title="Entwurf speichern"
+                  onPress={() => {
+                    if (!this.state.title) {
+                      return Alert.alert(
+                        "Fehler!",
+                        "Gib dem Entwurf zumindest einen Titel"
+                      );
                     }
 
-                    return AsyncStorage.setItem("draftIds", draftIds);
-                  })
-                  .then(() => AsyncStorage.setItem(`draft:${id}`, data))
-                  .then(() => this.resetState())
-                  .catch(e => Alert.alert("Es ist ein Fehler aufgetreten", e));
-              }}
-            />
+                    const data = JSON.stringify(this.getComposeData());
+                    const id = generateUuid();
+                    AsyncStorage.getItem("draftIds")
+                      .then(draftIds => {
+                        if (!draftIds) {
+                          draftIds = id;
+                        } else {
+                          draftIds += ";" + id;
+                        }
+
+                        return AsyncStorage.setItem("draftIds", draftIds);
+                      })
+                      .then(() => AsyncStorage.setItem(`draft:${id}`, data))
+                      .then(() => this.resetState())
+                      .catch(e =>
+                        Alert.alert("Es ist ein Fehler aufgetreten", e)
+                      );
+                  }}
+                />
+              </React.Fragment>
+            ) : null}
             <Button
               title="Vorschau und veröffentlichen"
-              onPress={() => this.setState({ showPreview: true })}
+              onPress={() => {
+                if (!this.state.title) {
+                  return Alert.alert("Fehler", "Gib dem Beitrag einen Titel");
+                }
+
+                if (!this.state.content) {
+                  return Alert.alert(
+                    "Fehler",
+                    "Dein Beitrag besitzt keinen Inhalt"
+                  );
+                }
+
+                this.setState({ showPreview: true });
+              }}
             />
+            <Button title="Zurücksetzen" onPress={this.resetState} />
             <PostPreviewModal
               visible={this.state.showPreview}
+              updateId={this.state.updateId}
               title={this.state.title}
               lead={this.state.lead}
               content={this.state.content}
+              sources={this.state.sources}
               onCreate={this.resetState}
+              onUpdate={this.resetState}
               close={() => this.setState({ showPreview: false })}
             />
           </KeyboardAvoidingView>

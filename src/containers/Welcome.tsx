@@ -9,6 +9,7 @@ import {
   Alert,
   Clipboard
 } from "react-native";
+import * as EmailValidator from "email-validator";
 
 import ViewWrapper from "../components/ViewWrapper";
 import Border from "../components/Border";
@@ -70,6 +71,16 @@ class WelcomeComponent extends React.Component<Props, State> {
   };
 
   onPress = () => {
+    if (!this.state.email || !this.state.name) {
+      Alert.alert("Achtung!", "Bitte fülle alle Felder aus.");
+      return;
+    }
+
+    if (!EmailValidator.validate(this.state.email)) {
+      Alert.alert("Achtung!", "Deine E-Mail Adresse sieht etwas seltsam aus.");
+      return;
+    }
+
     this.props
       .dispatch(login(this.state.name, this.state.email))
       .then(() =>
@@ -111,8 +122,9 @@ class WelcomeComponent extends React.Component<Props, State> {
         <Border />
         <Wrapper>
           <Text>
-            Falls du dich noch nicht registriert hast, benötigen wir noch deinen
-            Namen. Ansonsten kannst du dieses Feld leer lassen
+            Gib hier noch deinen Namen ein. Dieser wird in deinen Beiträgen
+            öffentlich angezeigt. Du kannst natürlich auch eine Spitz- oder
+            Künstlernamen verwenden.
           </Text>
         </Wrapper>
         <Border />

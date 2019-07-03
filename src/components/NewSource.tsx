@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { View, Text, Button } from "react-native";
 import Dropdown from "./Dropdown";
 import Textarea from "./Textarea";
-import { Source } from "./compose/Sources";
+import { Source } from "./compose/EditableSources";
 import Border from "./Border";
 import InputView from "./InputView";
 

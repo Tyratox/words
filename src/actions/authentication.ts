@@ -26,7 +26,7 @@ export const createLogoutAction = (): LogoutAction => ({ type: "LOGOUT_USER" });
 export const login = (name, email, locale = "de-CH") => dispatch => {
   dispatch(createLoginAction(true, null, null));
 
-  return fetchApi("/login", {
+  return fetchApi("/login", dispatch, {
     headers: undefined,
     method: "POST",
     body: JSON.stringify({ name, email, locale })

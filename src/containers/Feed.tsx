@@ -10,7 +10,8 @@ import {
 import {
   NavigationScreenProp,
   NavigationParams,
-  createStackNavigator
+  createStackNavigator,
+  NavigationEvents
 } from "react-navigation";
 import gql from "graphql-tag";
 import styled from "styled-components";
@@ -32,7 +33,15 @@ const FETCH_LATEST_POSTS = gql`
       title
       lead
       content
+      sources {
+        type
+        title
+        author
+        url
+      }
       createdAt
+      canEdit
+      canDelete
 
       user {
         name
@@ -65,6 +74,7 @@ class FeedComponent extends React.Component<Props> {
 
             return (
               <Wrapper>
+                <NavigationEvents onDidFocus={() => refetch()} />
                 <FlatList
                   data={data.latestPosts}
                   keyExtractor={(item, index) => index.toString()}
@@ -107,6 +117,7 @@ class FeedComponent extends React.Component<Props> {
                           lead={item.lead}
                           fullLead={false}
                           content={false}
+                          showSources={false}
                         />
                       </TouchableOpacity>
                     );
