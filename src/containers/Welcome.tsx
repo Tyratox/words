@@ -88,7 +88,7 @@ class WelcomeComponent extends React.Component<Props, State> {
           "Anmeldung",
           "Um deine Anmeldung abzuschliessen, muss du auf den Link klicken, den wir dir in einer Mail versendet haben.",
           [
-            { text: "Okey!", onPress: () => {} },
+            { text: "Okay!", onPress: () => {} },
             {
               text: "Verwende URL aus der Zwischenablage",
               onPress: () => Clipboard.getString().then(this.handleSchemaUrl)
