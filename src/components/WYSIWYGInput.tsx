@@ -61,9 +61,6 @@ class WYSIWYGInput extends React.PureComponent<Props, State> {
             </FullsceenButton>
           )}
         </EditView>
-        <Border />
-        <Text>Vorschau:</Text>
-        <PostContent>{this.props.value}</PostContent>
       </StyledView>
     );
   }

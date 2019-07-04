@@ -43,6 +43,20 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const cleanTypeName = new ApolloLink((operation, forward) => {
+  if (operation.variables) {
+    const omitTypename = (key, value) =>
+      key === "__typename" ? undefined : value;
+    operation.variables = JSON.parse(
+      JSON.stringify(operation.variables),
+      omitTypename
+    );
+  }
+  return forward(operation).map(data => {
+    return data;
+  });
+});
+
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     /*graphQLErrors.map(({ message, locations, path }) =>
@@ -60,7 +74,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const link = ApolloLink.from([errorLink, authLink, httpLink]);
+const link = ApolloLink.from([cleanTypeName, errorLink, authLink, httpLink]);
 
 const client = new ApolloClient({
   link: link,

@@ -80,6 +80,7 @@ class FeedComponent extends React.Component<Props> {
                   keyExtractor={(item, index) => index.toString()}
                   refreshing={loading}
                   onRefresh={refetch}
+                  style={{ height: "100%" }}
                   onEndReachedThreshold={0.4}
                   onEndReached={() =>
                     fetchMore({

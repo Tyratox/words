@@ -74,24 +74,25 @@ class ComposeComponent extends React.Component<Props, State> {
     this.state = DEFAULT_STATE;
 
     //data was passed to us, use it
-    const parentNavigationState = this.props.navigation.dangerouslyGetParent();
+    const parentNavigation = this.props.navigation.dangerouslyGetParent();
     if (
-      parentNavigationState &&
-      parentNavigationState.state &&
-      parentNavigationState.state.params &&
-      parentNavigationState.state.params.id
+      parentNavigation &&
+      parentNavigation.state &&
+      parentNavigation.state.params &&
+      parentNavigation.state.params.id
     ) {
       this.state = {
         ...this.state,
-        updateId: parseInt(parentNavigationState.state.params.id),
-        title: parentNavigationState.state.params.title,
-        lead: parentNavigationState.state.params.lead,
-        content: parentNavigationState.state.params.content,
-        sources: parentNavigationState.state.params.sources
-          ? parentNavigationState.state.params.sources
+        updateId: parseInt(parentNavigation.state.params.id),
+        title: parentNavigation.state.params.title,
+        lead: parentNavigation.state.params.lead,
+        content: parentNavigation.state.params.content,
+        sources: parentNavigation.state.params.sources
+          ? parentNavigation.state.params.sources
           : [],
         cacheLoaded: true
       };
+      parentNavigation.setParams({ id: null });
     } else {
       this.loadData();
       this.storeInterval = setInterval(this.storeData, 5000);
@@ -99,26 +100,26 @@ class ComposeComponent extends React.Component<Props, State> {
   }
 
   onFocus = () => {
-    const parentNavigationState = this.props.navigation.dangerouslyGetParent();
+    const parentNavigation = this.props.navigation.dangerouslyGetParent();
     if (
-      parentNavigationState &&
-      parentNavigationState.state &&
-      parentNavigationState.state.params &&
-      parentNavigationState.state.params.id &&
-      parentNavigationState.state.params.id !== this.state.updateId
+      parentNavigation &&
+      parentNavigation.state &&
+      parentNavigation.state.params &&
+      parentNavigation.state.params.id &&
+      parentNavigation.state.params.id !== this.state.updateId
     ) {
       this.setState({
         ...this.state,
-        updateId: parseInt(parentNavigationState.state.params.id),
-        title: parentNavigationState.state.params.title,
-        lead: parentNavigationState.state.params.lead,
-        content: parentNavigationState.state.params.content,
-        sources: parentNavigationState.state.params.sources
-          ? parentNavigationState.state.params.sources
+        updateId: parseInt(parentNavigation.state.params.id),
+        title: parentNavigation.state.params.title,
+        lead: parentNavigation.state.params.lead,
+        content: parentNavigation.state.params.content,
+        sources: parentNavigation.state.params.sources
+          ? parentNavigation.state.params.sources
           : [],
         cacheLoaded: true
       });
-      parentNavigationState.setParams(undefined);
+      parentNavigation.setParams({ id: null });
     }
   };
 
