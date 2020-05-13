@@ -163,8 +163,8 @@ class ComposeComponent extends React.Component<Props, State> {
     return (
       <ViewWrapper>
         <NavigationEvents onDidFocus={this.onFocus} />
-        <ScrollView style={{ height: "100%" }}>
-          <KeyboardAvoidingView behavior="padding" enabled>
+        <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }} enabled>
+          <ScrollView style={{ height: "100%" }}>
             <Wrapper>
               <Heading>Text verfassen</Heading>
             </Wrapper>
@@ -299,8 +299,8 @@ class ComposeComponent extends React.Component<Props, State> {
               onUpdate={this.resetState}
               close={() => this.setState({ showPreview: false })}
             />
-          </KeyboardAvoidingView>
-        </ScrollView>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </ViewWrapper>
     );
   }
